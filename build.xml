@@ -10,6 +10,9 @@
 <project name="compiler" default="default" basedir=".">
     <description>Builds, tests, and runs the project compiler.</description>
     <import file="nbproject/build-impl.xml"/>
+    <import file="nbproject/build-antlr4-impl.xml"/>
+    <target name="-post-init" depends="-antlr4.init"/>
+    <target name="-pre-compile" depends="antlr4"/>
     <!--
 
     There exist several targets which are by default empty and which can be 
