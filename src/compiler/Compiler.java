@@ -17,9 +17,11 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import parser.GrammarBaseVisitor;
-import parser.GrammarLexer;
-import parser.GrammarParser;
+import visitor.Visitor;
+import gramatica.GrammarLexer;
+import gramatica.GrammarParser;
+//import parser.GrammarLexer;
+//import parser.GrammarParser;
 
 public class Compiler {
     public static void main(String[] args) throws IOException {
@@ -40,7 +42,7 @@ public class Compiler {
         GrammarParser parser = new GrammarParser(tokens);         //Parser
         GrammarParser.ProgContext prog = parser.prog();        //Exec Parser prog
         showParseTreeFrame(prog,parser);
-        GrammarBaseVisitor pv = new GrammarBaseVisitor();
+        Visitor pv = new Visitor();
         pv.visit(prog);
     }
     private static void showParseTreeFrame(ParseTree tree, GrammarParser parser) throws HeadlessException {

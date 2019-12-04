@@ -1,7 +1,7 @@
 grammar Grammar;
 
 @header{
-    package parser;
+    package gramatica;
 }
 
 prog    : include? function? main
@@ -13,55 +13,57 @@ main    : MAIN block
 include : (INCLUDE VAR MEOL)+
         ;
 
-stmt    : print MEOL
-        | println MEOL
-        | read MEOL
-        | expr MEOL
-        | ifelse
-        | forloop
-        | whileloop
-        | var MEOL
+stmt    : print MEOL                        #stmtPrint
+        | println MEOL                      #stmtPrintln
+        | read MEOL                         #stmtRead     
+        | expr MEOL                         #stmtExpr
+        | ifelse                            #stmtifelse
+        | forloop                           #stmtForloop
+        | whileloop                         #stmtWhileloop
+        | var MEOL                          #stmtVar
+        | atr MEOL                          #stmtAtr
         ;
 
-print   : PRINT B_EXPR expr E_EXPR MEOL
+print   : PRINT B_EXPR expr E_EXPR          #printR
         ;
 
-println : PRINTLN B_EXPR expr E_EXPR MEOL WS
+println : PRINTLN B_EXPR expr E_EXPR        #printlnR
         ;
 
-read    : SCAN B_EXPR expr E_EXPR MEOL
+read    : SCAN B_EXPR expr E_EXPR           #readR
         ;
 
-expr    : term SUM expr 
-        | term MINUS expr
+expr    : term SUM expr                     #exprSum
+        | term MINUS expr                   #exprMinus
+        | term                              #exprTerm
         ;
 
-term    : fact MULT term 
-        | fact DIV term 
-        | fact PORC term
+term    : fact MULT term                    #termMult
+        | fact DIV term                     #termDiv
+        | fact PORC term                    #termPorc
+        | fact                              #termFact
         ;
 
-fact    : VAR 
-        | NUM 
-        | B_EXPR expr E_EXPR 
+fact    : VAR                               #factVar
+        | NUM                               #factNum
+        | B_EXPR expr E_EXPR                #factExpr
         ;
 
-ifelse  : IF B_EXPR boolExpr E_EXPR block 
-        | IF B_EXPR boolExpr E_EXPR block ELSE block
+ifelse  : MIF B_EXPR boolExpr E_EXPR block              #ifif
+        | MIF B_EXPR boolExpr E_EXPR block ELSE block   #ififelse
         ;
 
-block   : 
-        | B_BLOC (stmt)+ E_BLOC
+block   : stmt?                             #blocStmt
+        | B_BLOC stmt* E_BLOC               #blockStmtP
         ;
 
-boolExpr: fact 
-        | NOT boolExpr 
-        | fact relop fact 
-        | TRUE 
-        | FALSE
+boolExpr: expr                              #boolExprR
+        | NOT boolExpr                      #notBool
+        | expr relop expr                   #boolRelop
+        | booleano                          #boolbool
         ;
 
-relop   : MAIOR 
+relop   : MAIOR
         | MENOR 
         | EEQUALS 
         | Ma_IGUAL 
@@ -69,31 +71,31 @@ relop   : MAIOR
         | DIF
         ;
 
-forloop : FOR B_EXPR atr MMEOL boolExpr MMEOL atr E_EXPR B_BLOC block E_BLOC
+forloop : FOR B_EXPR var MEOL boolExpr MEOL atr E_EXPR block    #forloopR
         ;
 
-whileloop   : WHILE B_EXPR boolExpr E_EXPR B_BLOC block E_BLOC
+whileloop   : WHILE B_EXPR boolExpr E_EXPR B_BLOC block E_BLOC  #whileloopR
             ;
 
-atr     : VAR EQUALS expr
-        | VAR SUM SUM
-        | VAR MINUS MINUS
+atr     : VAR EQUALS expr                   #atrEqual
+        | VAR SUM SUM                       #atrPlusPlus
+        | VAR MINUS MINUS                   #atrMinusMinus
         ;
 
-var     : tipo VAR EQUALS expr
+var     : tipo VAR EQUALS expr              #varAtr
         ;
 
-function    : tipo VAR B_EXPR ((tipo VAR)(VIG tipo VAR)*)? E_EXPR B_BLOC block E_BLOC
+function    : tipo VAR B_EXPR ((tipo VAR)(VIG tipo VAR)*)? E_EXPR B_BLOC block E_BLOC   #functionR
             ;
 
-tipo    : INT
-        | STRING
-        | FLOAT
-        | booleano
+tipo    : INT                               #tipoInt
+        | STRING                            #tipoString
+        | FLOAT                             #tipoFloat
+        | booleano                          #tipoBool
         ;
 
-booleano : MYTRUE
-        | MYFALSE
+booleano : MYTRUE                           #boolTrue
+        | MYFALSE                           #boolFalse
         ;
 
 MAIN    : 'main';
@@ -127,7 +129,7 @@ EEQUALS  : '==';
 DIF     : '!=';
 PRINTLN : 'println';
 WHILE   : 'while';
-IF      : 'if';
+MIF      : 'if';
 ELSE    : 'else';
 FOR     : 'for';
 BREAK   : 'break';
