@@ -4,121 +4,120 @@ grammar Grammar;
     package gramatica;
 }
 
-prog    : include? function? main
+prog    : include? main
         ;
 
 main    : MAIN block
         ;
 
-include : (INCLUDE VAR MEOL)+
+include : (INCLUDE VAR EOL)+
         ;
 
-stmt    : print MEOL                        #stmtPrint
-        | println MEOL                      #stmtPrintln
-        | read MEOL                         #stmtRead     
-        | expr MEOL                         #stmtExpr
-        | ifelse                            #stmtifelse
-        | forloop                           #stmtForloop
-        | whileloop                         #stmtWhileloop
-        | var MEOL                          #stmtVar
-        | atr MEOL                          #stmtAtr
+ifstmt          : IF '(' cond ')' block b1=block                                #ifStmtX
+                | IF '(' cond ')' b1=block ELSE b2=block                        #ifStmtElse
+                ;
+                  
+
+cond    :expr            #condExpr
+        |expr relop=('>'|'<'|'=='|'>='|'<=') expr #condRelop
         ;
 
-print   : PRINT B_EXPR expr E_EXPR          #printR
+expr            : term '+' expr                                                 #exprPlus
+                | term '-' expr                                                 #exprMin
+                | term                                                          #exprTerm
+                ;
+
+term            : fact '*' expr                                                 #termMult
+                | fact '/' expr                                                 #termDiv
+                | fact                                                          #termFact
+                ;
+
+fact: '(' expr ')' #expr2par
+        | NUM #exprNum
+        | VAR #exprId
+        | STRING # exprStr
+        | CHARC #exprChar
+        | booleanb #exprBool
+;
+
+booleanb  : TRUE   #exprTrue
+          | FALSE  #exprFalse
+          ;  
+
+block   : stmt?          #blockSingle
+        | '{' stmt* '}'  #blockCompose
         ;
 
-println : PRINTLN B_EXPR expr E_EXPR        #printlnR
+stmt            : printfin EOL #stmtPrintf
+                | ifstmt #stmtIf //OK
+                | attr EOL #stmtAttr //OK
+                | expr EOL #stmtExpr
+                | scan EOL #stmtScan
+                | dec EOL #stmrDec //OK
+                | whilee  #stmtWhile //OK
+                | foor  #stmtFor //OK
+                ;
+
+
+whilee : WHILE '(' cond ')' block #whilex
+       ;
+
+foor : FOR '(' forzin EOL cond EOL attr ')' block  #foorx
         ;
 
-read    : SCAN B_EXPR expr E_EXPR           #readR
+
+forzin  : attr
+        | dec  
         ;
 
-expr    : term SUM expr                     #exprSum
-        | term MINUS expr                   #exprMinus
-        | term                              #exprTerm
+scan    : SCANF '(' PORC types ',' VAR')' #attrScan
         ;
 
-term    : fact MULT term                    #termMult
-        | fact DIV term                     #termDiv
-        | fact PORC term                    #termPorc
-        | fact                              #termFact
+types: DOUBLE
+    | CHAR
+    | INT
+    ;
+printfin : 'printf' B_EXPR expr E_EXPR #print
         ;
+attr:  VAR '=' expr #attrExpr
+    |  VAR '-' '-' #attrMinuMinus
+    | VAR '+' '+' #attrPlusPlus
+    ;
 
-fact    : VAR                               #factVar
-        | NUM                               #factNum
-        | B_EXPR expr E_EXPR                #factExpr
-        ;
 
-ifelse  : MIF B_EXPR boolExpr E_EXPR block              #ifif
-        | MIF B_EXPR boolExpr E_EXPR block ELSE block   #ififelse
-        ;
 
-block   : stmt?                             #blocStmt
-        | B_BLOC stmt* E_BLOC               #blockStmtP
-        ;
+dec   : type VAR                                                      #declSimple
+      | type '*' VAR                                                   #declPointer
+      | type VAR '[' expr ']'                                          #declArray
+      | type VAR '=' expr                                              #declVSimple
+      | type '*' VAR '=' expr                                          #declValuePointer
+      | CHAR VAR '[' expr? ']' '=' STRING                              #declArrayS
+;
 
-boolExpr: expr                              #boolExprR
-        | NOT boolExpr                      #notBool
-        | expr relop expr                   #boolRelop
-        | booleano                          #boolbool
-        ;
+type: INT
+    | CHAR
+    | DOUBLE
+    | STRING
+    ;
 
-relop   : MAIOR
-        | MENOR 
-        | EEQUALS 
-        | Ma_IGUAL 
-        | M_IGUAL 
-        | DIF
-        ;
-
-forloop : FOR B_EXPR var MEOL boolExpr MEOL atr E_EXPR block    #forloopR
-        ;
-
-whileloop   : WHILE B_EXPR boolExpr E_EXPR B_BLOC block E_BLOC  #whileloopR
-            ;
-
-atr     : VAR EQUALS expr                   #atrEqual
-        | VAR SUM SUM                       #atrPlusPlus
-        | VAR MINUS MINUS                   #atrMinusMinus
-        ;
-
-var     : tipo VAR EQUALS expr              #varAtr
-        ;
-
-function    : tipo VAR B_EXPR ((tipo VAR)(VIG tipo VAR)*)? E_EXPR B_BLOC block E_BLOC   #functionR
-            ;
-
-tipo    : INT                               #tipoInt
-        | STRING                            #tipoString
-        | FLOAT                             #tipoFloat
-        | booleano                          #tipoBool
-        ;
-
-booleano : MYTRUE                           #boolTrue
-        | MYFALSE                           #boolFalse
-        ;
 
 MAIN    : 'main';
 INCLUDE : '#include';
 PRINT   : 'print';
-SCAN    : 'read';
+I       : 'i';
 INT     : 'int';
-STRING  : 'string';
-FLOAT   : 'float';
-TRUE    : 'true';
-FALSE   : 'false';
+DOUBLE  : 'double';
+CHAR    : 'char';
 SUM     : '+';
 DIV     : '/';
 MULT    : '*';
 MINUS   : '-';
 PORC    : '%';
-MYTRUE    : 'true';
-MYFALSE   : 'false';
+TRUE    : 'true';
+FALSE   : 'false';
 EQUALS  : '=';
 B_EXPR  : '(';
 E_EXPR  : ')';
-B_BLOC  : '{';
-E_BLOC  : '}';
 SWITCH  : 'switch';
 CASE    : 'case';
 M_IGUAL : '<=';
@@ -127,16 +126,22 @@ MAIOR    :'>';
 MENOR    :'<';
 EEQUALS  : '==';
 DIF     : '!=';
-PRINTLN : 'println';
 WHILE   : 'while';
-MIF      : 'if';
-ELSE    : 'else';
+IF      : 'if';
+DO      : 'do';
 FOR     : 'for';
 BREAK   : 'break';
 DEFAULT : 'default';
-MEOL     : ';';
-NOT     : '!';
-VAR     : [a-zA-Z][a-zA-Z0-9_]*;
-VIG     : ',';
-NUM     : [+-]?[0-9]+('.'[0-9]+)?;
-WS      : [ \t\n] -> skip;
+CHARC   : '\''.'\'';
+NUM     : [0-9]+ ;
+VAR      : [_a-zA-Z][_a-zA-Z0-9]*;
+STRING  : '"'(~["\\\r\n])*'"';
+ELSE    : 'else';
+PRINTF   : 'printfa';
+SCANF    : 'scanf';
+B_BLOCK : '{';
+E_BLOCK : '}';
+EOL     : ';';
+D       : 'd';
+S       : 's';
+WS      : [ \t\n\r] -> skip;

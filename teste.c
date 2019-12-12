@@ -2,16 +2,20 @@
 #include biblio2;
 
 main {
-    int abc = 1 + 1;
-    println(abc);
-    read(abc);
-    for(int i=0; i<3; i++){
-        abc = 1;
-        if(abc > 0){
-            print(abc);
-        }
+    double a;
+    double b;
+    double d;
+    a = 10;
+    a++;
+    b = 10;
+    d = a+b;
+    printf(d);
+    if(a>b){
+        a = 30;
+        printf(a);
     }
-    while(abc<10){
-        abc++;
+    while(a>b){
+        b++;
+        printf(b);
     }
 }
